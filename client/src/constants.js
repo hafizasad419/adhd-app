@@ -20,7 +20,7 @@ export const IS_PRODUCTION =
 
 
 export const BASE_URL = IS_PRODUCTION ?
-    "https://adhd-app.vercel.app/api/v1" :
+    "https://adhd-app-backend.vercel.app/api/v1" :
     "http://localhost:5000/api/v1"
 
 
