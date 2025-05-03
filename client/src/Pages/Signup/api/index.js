@@ -8,7 +8,8 @@ export const userSignup = async (values) => {
         gender,
         email,
         password,
-        role
+        role,
+        weight
     } = values;
 
     try {
@@ -18,7 +19,8 @@ export const userSignup = async (values) => {
             gender,
             email,
             password,
-            role
+            role,
+            weight
         });
 
         if (response.status === 201) {

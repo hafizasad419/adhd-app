@@ -36,7 +36,17 @@ const Signup = () => {
                 return year >= 1900 && date <= today;
             }).required('Required'),
 
-        gender: yup.string().oneOf(GENDERS, 'Invalid gender').required('Required'),
+        gender: yup.
+            string().
+            oneOf(GENDERS, 'Invalid gender')
+            .required('Required'),
+
+        weight: yup
+            .number()
+            .max(500, "Hmmmm....Are you sure?")
+            .typeError("Only numeric values allowed")
+            .required("Required")
+        ,
         email: yup.string().email('Invalid email').required('Required'),
         password: yup
             .string()
@@ -54,11 +64,13 @@ const Signup = () => {
 
     const initialValues = {
         name: '',
-        dateOfBirth: '', // This will be a string in YYYY-MM-DD format
-        gender: '',
         email: '',
         password: '',
+        gender: '',
+        dateOfBirth: '', // This will be a string in YYYY-MM-DD format
+        weight: '',
         confirmPassword: '',
+
     };
 
     const handleSubmit = async (values, { setSubmitting }) => {
@@ -122,6 +134,10 @@ const Signup = () => {
                                     options={GENDERS.map(g => ({ label: g, value: g }))}
                                     placeholder="Select gender"
                                 />
+                                <TextField
+                                    field="weight"
+                                    label_text="Weight (in Kg)" placeholder="e.g, 58" />
+
                                 <TextField field="email" label_text="Email" placeholder="Enter your email" />
                                 <TextField
                                     field="password"

@@ -1,9 +1,9 @@
 import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
-const Dashboard = lazy(() => import('@src/Pages/Dashboard'))
+const Dashboard = lazy(() => import('@src/Pages/Admin/Dashboard'))
 
-function ProtectedRoutes() {
+function AdminRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -13,4 +13,4 @@ function ProtectedRoutes() {
     )
 }
 
-export default ProtectedRoutes
+export default AdminRoutes

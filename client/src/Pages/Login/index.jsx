@@ -41,7 +41,7 @@ const Login = () => {
 
             if (loggedInUser) {
                 dispatch(loginSuccess(loggedInUser?.user));
-                setToken(loggedInUser);
+                setToken("user", loggedInUser);
                 navigate("/")
             }
         }
