@@ -22,7 +22,7 @@ export const userLogin = async (
             return response.data;
         }
     } catch (error) {
-        throw error.response ? error : new Error("Something went wrong, PLease Try again after some time.");
+        throw error.response ? error : new Error("Something went wrong, Please Try again after some time.");
 
     }
 

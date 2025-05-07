@@ -31,7 +31,15 @@ const TextField = ({
               disabled={isDisabled}
               placeholder={placeholder}
               onChange={(e) => {
-                const value = onChange ? onChange(e) ?? e.target.value : e.target.value;
+                let value = e.target.value;
+                if (onChange) {
+                  const result = onChange(e);
+                  // only use result if it's a string or number
+                  if (typeof result === 'string' || typeof result === 'number') {
+                    value = result;
+                  }
+                }
+              
                 formikField.onChange({
                   target: {
                     name: formikField.name,
@@ -39,6 +47,7 @@ const TextField = ({
                   }
                 });
               }}
+              
               className={`w-full px-3 py-2 rounded-md bg-white text-gray-800 placeholder-gray-400 
                 outline-none border-2 focus:border-gray-300 transition-all
                 ${Icon ? "pl-10" : ""}
@@ -50,9 +59,9 @@ const TextField = ({
             {meta.touched && meta.error && (
               <p className="error-message mt-1 text-xs">{meta.error}</p>
             )}
-            {meta.touched && !meta.error && (
+            {/* {meta.touched && !meta.error && (
               <p className="success-message mt-1 text-xs">Looks good!</p>
-            )}
+            )} */}
           </div>
         )}
       </Field>

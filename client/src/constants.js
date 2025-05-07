@@ -19,9 +19,15 @@ export const IS_PRODUCTION =
 
 
 
+// export const BASE_URL = IS_PRODUCTION ?
+//     "https://adhd-app-backend.vercel.app/api/v1" :
+//     "http://localhost:5000/api/v1"
+
+// fortesting local host on mobile
+
 export const BASE_URL = IS_PRODUCTION ?
     "https://adhd-app-backend.vercel.app/api/v1" :
-    "http://localhost:5000/api/v1"
+    "http://192.168.1.108:5000/api/v1"
 
 
 export const ADHD_APP_ACCESS = "adhd-app-access"
@@ -58,49 +64,49 @@ export const SYMPTOMS = [
       id: "impulsivity",
       name: "Impulsivity / acts without thinking",
       category: "Behavioral",
-      defaultValue: 6,
+      defaultValue: 1,
     },
     {
       id: "attention",
       name: "Trouble paying attention / staying focused",
       category: "Behavioral",
-      defaultValue: 6,
+      defaultValue: 1,
     },
     {
       id: "forgetful",
       name: "Forgetful / loses things",
       category: "Behavioral",
-      defaultValue: 3,
+      defaultValue: 1,
     },
     {
       id: "anxiety",
       name: "Anxiety / worry",
       category: "Behavioral",
-      defaultValue: 8,
+      defaultValue: 1,
     },
     {
       id: "mood",
       name: "Sad / moody",
       category: "Behavioral",
-      defaultValue: 9,
+      defaultValue: 1,
     },
     {
       id: "irritable",
       name: "Irritable / angry",
       category: "Behavioral",
-      defaultValue: 2,
+      defaultValue: 1,
     },
     {
       id: "rude",
       name: "Rude / cruel / hateful",
       category: "Behavioral",
-      defaultValue: 2,
+      defaultValue: 1,
     },
     {
       id: "tantrums",
       name: "Tantrums",
       category: "Behavioral",
-      defaultValue: 10,
+      defaultValue: 1,
     },
     {
       id: "aggression",
@@ -112,19 +118,19 @@ export const SYMPTOMS = [
       id: "disobedient",
       name: "Disobedient / defiance",
       category: "Behavioral",
-      defaultValue: 10,
+      defaultValue: 1,
     },
     {
       id: "sleep",
       name: "Sleep problems",
       category: "Physical",
-      defaultValue: 10,
+      defaultValue: 1,
     },
     {
       id: "eating",
       name: "Picky Eating",
       category: "Physical",
-      defaultValue: 6,
+      defaultValue: 1,
     },
     {
       id: "gas",
@@ -136,7 +142,7 @@ export const SYMPTOMS = [
       id: "constipation",
       name: "Gut Symptoms - Constipation",
       category: "Physical",
-      defaultValue: 2,
+      defaultValue: 1,
     },
     {
       id: "diarrhea",

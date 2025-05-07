@@ -40,8 +40,7 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user',
         required: true
-    },
-    symptomsEntries: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SymptomsEntries' }],
+    }
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {

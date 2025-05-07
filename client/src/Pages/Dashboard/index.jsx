@@ -1,5 +1,5 @@
+import { useSelector } from "react-redux"
 import { useState, useEffect } from "react"
-import { SuccessNotification } from "@src/utils"
 // Components
 import ProfileOverviewCard from "./components/ProfileOverviewCard"
 import CalendarPicker from "./components/CalendarPicker"
@@ -10,9 +10,9 @@ import SymptomList from "./components/SymptomList"
 
 // Utils and data
 import { SYMPTOMS } from "@src/constants.js"
-import { formatDate, generateTrendData, generateBaselineChangeData, calculateTotalScore } from "@src/utils.js"
-import { useSelector } from "react-redux"
-import { BiLoaderAlt } from "react-icons/bi"
+import { formatDate, generateTrendData, generateBaselineChangeData, calculateTotalScore, ErrorNotification, SuccessNotification } from "@src/utils.js"
+import { Axios } from "@src/api"
+
 
 /**
  * Main Home component that serves as the container for the ADHD Symptom Tracker dashboard
@@ -20,17 +20,55 @@ import { BiLoaderAlt } from "react-icons/bi"
 const Dashboard = () => {
     const user = useSelector(state => state.user)
 
-    // State for selected date
     const [selectedDate, setSelectedDate] = useState(new Date())
-
-    // State for symptom entries
     const [symptoms, setSymptoms] = useState([])
-
-    // State for saving status
     const [isSaving, setIsSaving] = useState(false)
-
-    // State for total score
     const [totalScore, setTotalScore] = useState(0)
+    const [entryAlreadySaved, setEntryAlreadySaved] = useState(false);
+
+
+
+    const fetchSymptomEntryForDate = async (date) => {
+        try {
+            const res = await Axios.get("/symptom-logs/by-date", {
+                params: {
+                    userId: user?._id,
+                    date: date,
+                }
+            });
+
+            console.log(res)
+
+            if (res.status === 200) {
+                // Populate saved symptoms and score
+                const savedScores = res.data.scores;
+
+                const updatedSymptoms = SYMPTOMS.map(symptom => {
+                    const matchingScore = savedScores.find(s => s.symptomId === symptom.id);
+                    return {
+                        ...symptom,
+                        value: matchingScore?.score || symptom.defaultValue,
+                    }
+                });
+
+                setSymptoms(updatedSymptoms);
+                setEntryAlreadySaved(true);
+            }
+        } catch (err) {
+            if (err?.response?.status === 404) {
+                // No entry found
+                const initialSymptoms = SYMPTOMS.map((symptom) => ({
+                    ...symptom,
+                    value: symptom.defaultValue,
+                }));
+                setSymptoms(initialSymptoms);
+                setEntryAlreadySaved(false);
+            } else {
+                ErrorNotification("Failed to fetch entry for selected date");
+            }
+        }
+    };
+
 
     // Initialize symptoms with default values
     useEffect(() => {
@@ -48,6 +86,15 @@ const Dashboard = () => {
         setTotalScore(score)
     }, [symptoms])
 
+    // Fetch Symptom Entry For Selected Date
+    useEffect(() => {
+        if (user?._id) {
+            fetchSymptomEntryForDate(new Date(selectedDate.setHours(0, 0, 0, 0)).toISOString());
+        }
+    }, [selectedDate, user?._id]);
+
+
+
     // Mock data for charts
     const trendData = generateTrendData()
     const baselineChangeData = generateBaselineChangeData()
@@ -58,17 +105,28 @@ const Dashboard = () => {
     }
 
     // Handle save button click
-    const handleSaveEntry = () => {
-        setIsSaving(true)
+    const handleSaveEntry = async (scores) => {
+        try {
+            setIsSaving(true);
+            const response = await Axios.post('/symptom-logs', {
+                userId: user?._id,
+                date: selectedDate.toISOString(),
+                scores
+            });
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsSaving(false)
-            SuccessNotification("Today's entry saved successfully!")
-        }, 1000)
+            if (response.status === 201 || response.status === 200) {
+                SuccessNotification('Entry saved successfully!');
+                return response.data;
+            }
+        } catch (error) {
+            ErrorNotification(error?.response?.data?.error || 'Failed to save entry.');
+            throw error.response ? error : new Error("Something went wrong");
+        } finally {
+            setIsSaving(false);
+        }
     }
 
-    // Mock profile data
+
     const profileData = {
         name: user.name,
         lastUpdated: user.updatedAt,
@@ -79,7 +137,7 @@ const Dashboard = () => {
 
     return (
         <main
-            className="px-4 md:px-12 py-6"
+            className="px-4 md:px-12 py-6 overflow-hidden"
         >
 
             <div className="mb-6">
@@ -106,40 +164,25 @@ const Dashboard = () => {
                     <CalendarPicker
                         selectedDate={selectedDate}
                         onDateChange={setSelectedDate} />
-
-                    <div className="mt-6">
-                        <SymptomScoreCard
-                            score={totalScore} />
-                    </div>
+                    {
+                        entryAlreadySaved && (
+                            <div className="mt-6">
+                                <SymptomScoreCard
+                                    score={totalScore} />
+                            </div>
+                        )
+                    }
                 </div>
             </div>
 
             {/* Symptoms section */}
             <SymptomList
                 symptoms={symptoms}
-                onSymptomChange={handleSymptomChange} />
-
-            {/* Save button */}
-            <div className="flex justify-center mt-8 mb-4">
-                <button
-                    onClick={handleSaveEntry}
-                    disabled={isSaving}
-                    className="btn-primary flex items-center justify-center"
-                >
-                    {isSaving ? (
-                        <span className="flex items-center gap-2">
-                            <BiLoaderAlt className="animate-spin h-4 w-4" />
-                            Saving...
-                        </span>
-                    ) : (
-                        "Save Today's Entry"
-                    )}
-                </button>
-            </div>
-
-
-
-
+                onSymptomChange={handleSymptomChange}
+                isSaving={isSaving}
+                handleSaveEntry={handleSaveEntry}
+                entryAlreadySaved={entryAlreadySaved}
+            />
 
         </main>
     )
