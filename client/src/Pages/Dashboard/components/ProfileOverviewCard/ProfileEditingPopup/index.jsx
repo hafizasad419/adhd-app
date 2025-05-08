@@ -2,7 +2,8 @@ import { Formik, Form } from "formik";
 import TextField from "@src/Components/FormikFields/TextField";
 import * as yup from "yup";
 import { Axios } from "@src/api";
-import { dateFormat, ErrorNotification, formatDateOfBirthInput, SuccessNotification, updateAuthUser } from "@src/utils";
+import { DATE_FORMAT_REGEX } from "@src/constants";
+import { ErrorNotification, formatDateOfBirthInput, SuccessNotification, updateAuthUser } from "@src/utils";
 import { useState } from "react";
 import BasePopup from "@src/Components/UI/BasePopup";
 import { BiLoaderAlt } from "react-icons/bi";
@@ -22,7 +23,7 @@ const ProfileEditingPopup = ({ profile, onClose}) => {
             .max(500, "Hmmmm....Are you sure?"),
         dateOfBirth: yup
             .string()
-            .matches(dateFormat, "Invalid date format. Please use YYYY-MM-DD")
+            .matches(DATE_FORMAT_REGEX, "Invalid date format. Please use YYYY-MM-DD")
             .test("is-valid-date", "Invalid date", (value) => {
                 if (!value) return true;
                 const date = new Date(value);

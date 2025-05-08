@@ -9,10 +9,10 @@ import { formatSymptomScoresPayload } from "@src/utils"
 const SymptomList = ({ symptoms, onSymptomChange, isSaving, handleSaveEntry, entryAlreadySaved }) => {
   return (
     <>
-      <div className="mt-6 md:max-w-3xl md:pr-4">
+      <div className="mt-6 md:max-w-5xl md:pr-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Symptoms</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {symptoms.map((symptom) => (
             <SymptomCard
               key={symptom.id}
@@ -27,7 +27,7 @@ const SymptomList = ({ symptoms, onSymptomChange, isSaving, handleSaveEntry, ent
         <button
           onClick={() => handleSaveEntry(formatSymptomScoresPayload(symptoms))}
           disabled={isSaving || entryAlreadySaved}
-          className="btn-primary flex items-center justify-center"
+          className="btn-primary !px-8 flex items-center justify-center"
         >
           {entryAlreadySaved ? (
             <span>Entry Already Saved</span>
@@ -37,7 +37,7 @@ const SymptomList = ({ symptoms, onSymptomChange, isSaving, handleSaveEntry, ent
               Saving...
             </span>
           ) : (
-            "Save Today's Entry"
+            "Save Entry"
           )}
         </button>
       </div>

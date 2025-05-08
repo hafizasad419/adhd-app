@@ -65,9 +65,6 @@ export const formatSymptomScoresPayload = (symptoms) => {
 };
 
 
-export const dateFormat = /^\d{4}-\d{2}-\d{2}$/;  // RegEx for YYYY-MM-DD 
-
-
 export const setActiveRole = (role) => {
   localStorage.setItem(ACTIVE_USER_ROLE_KEY, role);
 };
@@ -143,6 +140,18 @@ export const formatDate = (date) => {
   return format(date, "EEEE, MMMM do, yyyy")
 }
 
+
+export const formatDateToYMD = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+
+
+
+
 /**
  * Format a date for display in the profile
  * @param {Date} date - The date to format
@@ -161,30 +170,52 @@ export const formatDateOfBirth = (date) => {
   return format(date, "MMMM d, yyyy")
 }
 
+// utils/getTrendChartData.js
 
+export const buildSymptomTrendData = async (selectedSymptomId, fetchAllSavedEntryDates, fetchSymptomEntryForDate) => {
+  const dates = await fetchAllSavedEntryDates();
+  const result = [];
 
-export const generateTrendData = (days = 7) => {
-  const data = []
-  const today = new Date()
+  for (const date of dates) {
+    const res = await fetchSymptomEntryForDate(date);
+    const scores = res?.data?.scores || [];
 
-  for (let i = days; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(today.getDate() - i)
+    const score = selectedSymptomId === "all"
+      ? scores.reduce((acc, s) => acc + (s?.score || 0), 0)
+      : scores.find(s => s.symptomId === selectedSymptomId)?.score || 0;
 
-    // Generate a score that trends upward slightly
-    const baseScore = 70
-    const randomVariation = Math.floor(Math.random() * 10) - 5
-    const trendIncrease = (days - i) * 2
-    const score = Math.min(100, Math.max(0, baseScore + randomVariation + trendIncrease))
-
-    data.push({
-      date: date.toISOString(),
-      score,
-    })
+    result.push({ date, score });
   }
 
-  return data
-}
+  return result;
+};
+
+
+
+
+// generates mock data
+// export const generateTrendData = (days = 7) => {
+//   const data = []
+//   const today = new Date()
+
+//   for (let i = days; i >= 0; i--) {
+//     const date = new Date()
+//     date.setDate(today.getDate() - i)
+
+//     // Generate a score that trends upward slightly
+//     const baseScore = 70
+//     const randomVariation = Math.floor(Math.random() * 10) - 5
+//     const trendIncrease = (days - i) * 2
+//     const score = Math.min(100, Math.max(0, baseScore + randomVariation + trendIncrease))
+
+//     data.push({
+//       date: date.toISOString(),
+//       score,
+//     })
+//   }
+
+//   return data
+// }
 
 /**
  * Generate mock baseline change data

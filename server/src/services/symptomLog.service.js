@@ -1,5 +1,7 @@
 import { SymptomLog } from "../models/symptomLog.model.js";
 import { AppError } from "../utils/index.js";
+import mongoose from "mongoose";
+import { DATE_FORMAT_REGEX } from "../constants.js"
 
 export const saveSymptomLogService = async (userId, date, scores) => {
   try {
@@ -7,8 +9,10 @@ export const saveSymptomLogService = async (userId, date, scores) => {
       throw new AppError(400, "User ID, date, and scores are required.");
     }
 
-    const logDate = new Date(date);
-    logDate.setUTCHours(0, 0, 0, 0); // normalize to midnight UTC
+
+    if (!DATE_FORMAT_REGEX.test(date)) {
+      throw new AppError(400, "Date must be in YYYY-MM-DD format.");
+    }
 
     const update = { scores };
     const options = {
@@ -18,7 +22,7 @@ export const saveSymptomLogService = async (userId, date, scores) => {
     };
 
     const symptomLog = await SymptomLog.findOneAndUpdate(
-      { user: userId, date: logDate },
+      { user: userId, date},
       update,
       options
     );
@@ -31,25 +35,41 @@ export const saveSymptomLogService = async (userId, date, scores) => {
 };
 
 
-export const getSymptomLogByUserAndDate = async (userId, dateISO) => {
-  const selectedDate = new Date(dateISO);
+export const getSymptomLogByUserAndDate = async (userId, date) => {
 
-  // Create start and end of that day (00:00:00 to 23:59:59)
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setUTCHours(0, 0, 0, 0);
+  if (!DATE_FORMAT_REGEX.test(date)) {
+      throw new AppError(400, "Date must be in YYYY-MM-DD format.");
+    }
 
-  const endOfDay = new Date(selectedDate);
-  endOfDay.setUTCHours(23, 59, 59, 999);
 
   const log = await SymptomLog.findOne({
     user: userId,
-    date: {
-      $gte: startOfDay,
-      $lte: endOfDay
-    }
+    date
   });
 
   return log;
 
+};
+
+
+
+export const getAllDatesWithEntriesForUserService = async (userId) => {
+  if (!userId) {
+    throw new AppError(400, "User ID is required.");
+  }
+
+  try {
+    // Step 1: Get all symptom logs for the user
+    const logs = await SymptomLog.find({ user: userId }).select("date -_id");
+    
+    const dates = logs.map(log => log.date.split("T")[0]); 
+    const uniqueDates = [...new Set(dates)];
+    uniqueDates.sort((a, b) => new Date(b) - new Date(a));
+  
+    return uniqueDates;
+
+  } catch (error) {
+    throw new AppError(500, "Failed to fetch dates with entries.");
+  }
 };
 

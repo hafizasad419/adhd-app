@@ -17,11 +17,14 @@ import {
   subMonths
 } from "date-fns"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { DATE_FORMAT_STRING } from "@src/constants"
 
-const CalendarPicker = ({ selectedDate, onDateChange }) => {
+const CalendarPicker = ({ selectedDate, onDateChange, entryDatesMap }) => {
+  // console.log("Entry Dates Mape:", entryDatesMap)
   const today = startOfDay(new Date())
   const weekStart = subDays(today, 6) // past 6 days + today = 7 days
   const [currentMonth, setCurrentMonth] = useState(today)
+
 
   // Allow navigation
   const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
@@ -57,34 +60,47 @@ const CalendarPicker = ({ selectedDate, onDateChange }) => {
           </div>
         ))}
 
-        {daysInCalendar.map((day) => {
+        {daysInCalendar.map((day, index) => {
+
           const isSelected = isSameDay(day, selectedDate)
           const isTodayDate = isToday(day)
           const isWithinRange = !isBefore(day, weekStart) && !isAfter(day, today)
 
+
+          const isSavedEntry = entryDatesMap[format(day, DATE_FORMAT_STRING)];
+
+          const dayClasses = [
+            "p-2 rounded-md cursor-pointer text-center transition-all",
+            isWithinRange ? "text-gray-900" : "text-gray-400",
+            isTodayDate ? "border border-blue-400" : "",
+            isSelected ? "bg-c-zinc text-white" : "",
+            isSavedEntry && !isSelected ? "bg-green-300 text-white" : "",
+          ].join(" ");
+
           return (
             <button
-              key={day.toString()}
-              onClick={() => isWithinRange && onDateChange(day)}
+              key={index}
+              onClick={() => isWithinRange && onDateChange(format(day, DATE_FORMAT_STRING))}
               disabled={!isWithinRange}
-              className={`
-                py-1 text-sm rounded-md
-                ${!isSameMonth(day, currentMonth) ? "text-gray-300" : ""}
-                ${isSelected ? "bg-teal-600 text-white" : "hover:bg-gray-100 "}
-                ${isTodayDate && !isSelected ? "border border-teal-600 text-teal-600" : ""}
-                ${
-                  isWithinRange
-                    ? "text-gray-700 cursor-pointer"
-                    : "text-gray-300 cursor-not-allowed"
-                }
-              `}
+              // className={`
+              //   py-1 text-sm rounded-md
+              //   ${!isSameMonth(day, currentMonth) ? "text-gray-300" : ""}
+              //   ${isSelected ? "bg-teal-600 text-white" : "hover:bg-gray-100 "}
+              //   ${isTodayDate && !isSelected ? "border border-teal-600 text-teal-600" : ""}
+              //   ${isWithinRange
+              //     ? "text-gray-700 cursor-pointer" :
+              //     isWithinRange && entryAlreadySaved ? "bg-green-500"
+              //       : "text-gray-300 cursor-not-allowed"
+              //   }
+              // `}
+              className={dayClasses}
             >
               {format(day, "d")}
             </button>
           )
         })}
       </div>
-    </div>
+    </div >
   )
 }
 

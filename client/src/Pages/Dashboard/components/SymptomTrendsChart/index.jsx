@@ -1,92 +1,111 @@
-import React, { useState } from "react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { useEffect, useState } from "react";
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid
+} from "recharts";
+import { SYMPTOMS } from "@src/constants";
+import Dropdown from "@src/Components/FormikFields/Dropdown";
+import { fetchAllSavedEntryDates, fetchSymptomEntryForDate } from "./api";
+import { useSelector } from "react-redux";
+import { format, parseISO } from "date-fns";
 
-/**
- * Chart component to display symptom trends over time
- * Shows line chart with symptom scores
- * Includes time period filters (Week, Month, etc.)
- */
-const SymptomTrendsChart = ({ data, symptomType }) => {
-  const [timeRange, setTimeRange] = useState("Month")
 
-  // Time range options
-  const timeRanges = ["Week", "Month", "3 Months", "6 Months", "Year"]
 
-  // Filter data based on selected time range
-  const filteredData = React.useMemo(() => {
-    // In a real app, this would filter based on the selected time range
-    return data
-  }, [data, timeRange])
+const ALL_SYMPTOMS_OPTION = { value: "all", label: "All Symptoms" };
+const symptomOptions = [
+  ALL_SYMPTOMS_OPTION,
+  ...SYMPTOMS.map(symptom => ({ value: symptom.id, label: symptom.name }))
+];
+
+const SymptomTrendsChart = () => {
+  const user = useSelector(state => state.user)
+  const userId = user?._id
+  const [selectedSymptom, setSelectedSymptom] = useState("all");
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadChartData = async () => {
+      setLoading(true);
+      try {
+        const datesMap = await fetchAllSavedEntryDates(userId); // returns { '2025-05-01': true, ... }
+        const dates = Object.keys(datesMap).sort(); // sort for better graph order
+        const allData = [];
+
+        for (const date of dates) {
+          const res = await fetchSymptomEntryForDate(userId, date); // returns { symptoms: [...] }
+
+          const symptoms = res.symptoms;
+          let score = 0;
+
+          if (selectedSymptom === "all") {
+            score = symptoms.reduce((acc, s) => acc + (s?.value || 0), 0);
+          } else {
+            const match = symptoms.find(s => s.id === selectedSymptom || s.symptomId === selectedSymptom);
+            score = match?.value ?? 0;
+          }
+
+          allData.push({
+            date: format(parseISO(date), "MMM dd yyyy"),
+            score
+          }
+          );
+        }
+
+        setChartData(allData);
+      } catch (err) {
+        console.error("Error loading chart data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadChartData();
+  }, [selectedSymptom, userId]);
+
+  const maxY = selectedSymptom === "all" ? 220 : 10;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-      <div className="mb-4">
-        <h2 className="font-medium text-gray-800 mb-2">Symptom Trends</h2>
+    <div className="w-full p-4 bg-white rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Symptom Trends</h2>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center">
-            <label htmlFor="symptomSelect" className="text-sm text-gray-600 mr-2">
-              Select Symptom:
-            </label>
-            <select
-              id="symptomSelect"
-              className="text-sm border border-gray-300 rounded px-2 py-1"
-              value={symptomType}
-              onChange={(e) => {}}
-            >
-              <option value="all">All Symptoms</option>
-              <option value="behavioral">Behavioral Symptoms</option>
-              <option value="physical">Physical Symptoms</option>
-            </select>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {timeRanges.map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`
-                  text-xs px-3 py-1 rounded-md
-                  ${timeRange === range ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
-                `}
-              >
-                {range}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="mb-6 max-w-xs">
+        <Dropdown
+          field="selectedSymptom"
+          options={symptomOptions}
+          placeholder="Select Symptom"
+          disableFormik
+          value={selectedSymptom}
+          onChange={setSelectedSymptom}
+        />
       </div>
 
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={filteredData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+      {loading ? (
+        <p className="text-gray-700">Loading chart...</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
+            <CartesianGrid stroke="#f5f5f5" />
             <XAxis
-              dataKey="date"
-              tickFormatter={(date) => new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-            <Tooltip
-              formatter={(value) => [`${value}`, "Score"]}
-              labelFormatter={(label) =>
-                new Date(label).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-              }
-            />
+              tick={{ fontSize: 10, fill: '#364153' }}
+              dataKey="date" />
+            <YAxis domain={[0, maxY]} />
+            <Tooltip />
             <Line
               type="monotone"
               dataKey="score"
-              stroke="#9f1239"
+              stroke="#00897b"
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
-              name="Total Symptom Score"
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default SymptomTrendsChart
+export default SymptomTrendsChart;

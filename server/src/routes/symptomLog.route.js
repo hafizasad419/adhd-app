@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { fetchSymptomLogByDate, saveSymptomLog } from "../controllers/symptomLog.controller.js";
+import { fetchSymptomLogByDate, getDatesWithEntries, saveSymptomLog } from "../controllers/symptomLog.controller.js";
 
 const symptomLogRouter = Router();
 
@@ -10,6 +10,10 @@ symptomLogRouter
 
 symptomLogRouter
     .get("/by-date", fetchSymptomLogByDate)
+
+
+symptomLogRouter
+    .get("/dates", getDatesWithEntries)
 
 
 export default symptomLogRouter;

@@ -7,7 +7,10 @@ const symptomScoreSchema = new mongoose.Schema({
 
 const symptomLogSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  date: { type: Date, required: true }, // auto-rounded to 00:00 of that day
+  date: {
+    type: String,
+    required: true
+  },
   scores: [symptomScoreSchema] // length = 22 (or less if you allow skipping)
 }, { timestamps: true });
 

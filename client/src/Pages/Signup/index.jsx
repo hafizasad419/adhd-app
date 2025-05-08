@@ -6,7 +6,8 @@ import { BiLoaderAlt } from 'react-icons/bi';
 import { userSignup } from './api';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { GENDERS } from '@src/constants';
-import { formatDateOfBirthInput, dateFormat } from '@src/utils';
+import { formatDateOfBirthInput } from '@src/utils';
+import {  DATE_FORMAT_REGEX } from '@src/constants';
 import { Brain } from 'lucide-react';
 
 
@@ -19,7 +20,7 @@ const Signup = () => {
         dateOfBirth: yup
             .string()
             .max(10)
-            .matches(dateFormat, 'Invalid date format. Please use YYYY-MM-DD').test('is-valid-date', 'Invalid date', (value) => {
+            .matches(DATE_FORMAT_REGEX, 'Invalid date format. Please use YYYY-MM-DD').test('is-valid-date', 'Invalid date', (value) => {
                 if (!value) return false;
                 const date = new Date(value);
                 const isValid =

@@ -1,3 +1,4 @@
+import { DATE_FORMAT_STRING } from '@src/constants';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css"; // Import date picker styles
 
@@ -8,7 +9,7 @@ const DatePickerField = ({ label, selected, onChange, error, ...props }) => {
       <DatePicker
         selected={selected}
         onChange={onChange}
-        dateFormat="yyyy-MM-dd" // Customize the date format as needed
+        dateFormat={DATE_FORMAT_STRING} // Customize the date format as needed
         className="w-full p-2 border rounded-md"
         {...props}
       />

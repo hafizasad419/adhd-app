@@ -1,4 +1,4 @@
-import { Info } from "lucide-react"
+import { Info, RotateCcw } from "lucide-react"
 
 /**
  * Card component for individual symptom with slider
@@ -7,13 +7,9 @@ import { Info } from "lucide-react"
 const SymptomCard = ({ symptom, onChange }) => {
   const { id, name, category, value, info } = symptom
 
-  // Get color based on severity value
-  const getSliderColor = (value) => {
-    if (value <= 3) return "bg-green-500"
-    if (value <= 6) return "bg-orange-500"
-    return "bg-red-500"
+  const handleReset = () => {
+    onChange(0)
   }
-
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
@@ -21,25 +17,37 @@ const SymptomCard = ({ symptom, onChange }) => {
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-gray-800">{name}</h3>
-            <div className={`p-1 rounded-full ${value <= 4 ? "text-green-500" : "text-red-500"}`}>
-              <Info size={14} />
+            <div className={`p-1 rounded-full ${value <= 4 ? "text-green-500" : value <= 6 ? "text-orange-300" : "text-red-500"}`}>
+              <Info
+                className="w-5 h-5"
+              />
             </div>
+
           </div>
           <p className="text-xs text-gray-500">{category}</p>
         </div>
-        <div className="text-lg font-semibold">{value}</div>
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-semibold">{value}</span>
+          <button
+            onClick={handleReset}
+            title="Reset"
+            className="text-gray-400 hover:text-gray-600 transition"
+          >
+            <RotateCcw className="w-4 h-4 cursor-pointer" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-4">
         <input
           type="range"
-          min="1"
+          min="0"
           max="10"
           value={value}
           onChange={(e) => onChange(Number.parseInt(e.target.value, 10))}
           className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-100  custom-slider-thumb"
           style={{
-            background: `linear-gradient(to right, #00897b 0%, #00897b ${((value - 1) / 9) * 100}%, #f3f4f6 ${((value - 1) / 9) * 100}%, #f3f4f6 100%)`,
+            background: `linear-gradient(to right, #00897b 0%, #00897b ${value / 10 * 100}%, #f3f4f6 ${value / 10 * 100}%, #f3f4f6 100%)`,
           }}
 
         />

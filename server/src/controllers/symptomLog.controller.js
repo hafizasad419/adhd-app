@@ -1,4 +1,4 @@
-import { saveSymptomLogService, getSymptomLogByUserAndDate } from "../services/symptomLog.service.js";
+import { saveSymptomLogService, getSymptomLogByUserAndDate, getAllDatesWithEntriesForUserService } from "../services/symptomLog.service.js";
 import { AppError, handleError } from "../utils/index.js";
 
 export const saveSymptomLog = async (req, res) => {
@@ -57,3 +57,22 @@ export const fetchSymptomLogByDate = async (req, res) => {
         handleError(res, error, error instanceof AppError ? error.statusCode : 500, "Failed to fetch symptom log.");
     }
 }
+
+
+export const getDatesWithEntries = async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      throw new AppError(400, "userId is required.");
+    }
+
+    const dates = await getAllDatesWithEntriesForUserService(userId);
+
+    res.status(200).json({
+      datesWithEntries: dates,
+    });
+  } catch (error) {
+    handleError(res, error, error instanceof AppError ? error.statusCode : 500, "Failed to fetch dates.");
+  }
+};
