@@ -220,28 +220,28 @@ export const buildSymptomTrendData = async (selectedSymptomId, fetchAllSavedEntr
 /**
  * Generate mock baseline change data
  */
-export const generateBaselineChangeData = (days = 7) => {
-  const data = []
-  const today = new Date()
-  const baselineValue = 0
+// export const generateBaselineChangeData = (days = 7) => {
+//   const data = []
+//   const today = new Date()
+//   const baselineValue = 0
 
-  for (let i = days; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(today.getDate() - i)
+//   for (let i = days; i >= 0; i--) {
+//     const date = new Date()
+//     date.setDate(today.getDate() - i)
 
-    // Generate a change that increases over time
-    const change = (days - i) * 0.3
-    const changePercent = Math.round(change * 100) / 10
+//     // Generate a change that increases over time
+//     const change = (days - i) * 0.3
+//     const changePercent = Math.round(change * 100) / 10
 
-    data.push({
-      date: date.toISOString(),
-      change,
-      changePercent,
-    })
-  }
+//     data.push({
+//       date: date.toISOString(),
+//       change,
+//       changePercent,
+//     })
+//   }
 
-  return data
-}
+//   return data
+// }
 
 /**
  * Calculate total symptom score from individual ratings

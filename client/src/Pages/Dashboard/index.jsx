@@ -11,7 +11,7 @@ import { format } from "date-fns";
 
 // Utils and data
 import { DATE_FORMAT_STRING, SYMPTOMS } from "@src/constants.js"
-import { formatDate, generateBaselineChangeData, calculateTotalScore, ErrorNotification, SuccessNotification } from "@src/utils.js"
+import { formatDate, calculateTotalScore, ErrorNotification, SuccessNotification } from "@src/utils.js"
 import { Axios } from "@src/api"
 
 
@@ -130,8 +130,6 @@ const Dashboard = () => {
     }, [user?._id])
 
 
-    // Mock data for charts
-    const baselineChangeData = generateBaselineChangeData()
 
     // Handle symptom value change
     const handleSymptomChange = (id, value) => {
@@ -194,8 +192,7 @@ const Dashboard = () => {
                     <SymptomTrendsChart
                     />
 
-                    <SymptomChangeFromBaselineChart
-                        data={baselineChangeData} />
+                    <SymptomChangeFromBaselineChart/>
                 </div>
 
                 {/* Right column */}
