@@ -26,9 +26,13 @@ const Dashboard = () => {
 
     const [symptoms, setSymptoms] = useState([])
     const [isSaving, setIsSaving] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [totalScore, setTotalScore] = useState(0)
     const [entryAlreadySaved, setEntryAlreadySaved] = useState(false);
     const [entryDatesMap, setEntryDatesMap] = useState({})
+    const [reloadChart, setReloadChart] = useState(false);
+    const [selectedSymptom, setSelectedSymptom] = useState("all")
+    const [selectedRange, setSelectedRange] = useState("Month")
 
 
 
@@ -97,8 +101,6 @@ const Dashboard = () => {
     }
 
 
-
-
     // Initialize symptoms with default values
     useEffect(() => {
         const initialSymptoms = SYMPTOMS?.map((symptom) => ({
@@ -151,6 +153,7 @@ const Dashboard = () => {
 
             if (response.status === 201 || response.status === 200) {
                 SuccessNotification('Entry saved successfully!');
+                setReloadChart(prevState => !prevState)
                 // ✅ Refresh entry data and saved dates immediately
                 await fetchSymptomEntryForDate(selectedDate);
                 await fetchAllSavedEntryDates();
@@ -165,12 +168,44 @@ const Dashboard = () => {
     }
 
 
+    // Handle delete entry 
+    const handleDeleteEntry = async () => {
+
+        // console.log("Deleting Entry With Date",  selectedDate)
+
+        try {
+            setIsDeleting(true);
+            const response = await Axios.delete('/symptom-logs', {
+                params: {
+                    userId: user?._id,
+                    date: selectedDate,
+                }
+            });
+
+            if (response.status === 200) {
+                SuccessNotification('Entry deleted successfully!');
+                setReloadChart(prevState => !prevState)
+                // ✅ Refresh entry data and saved dates immediately after deleting enry
+                await fetchSymptomEntryForDate(selectedDate);
+                await fetchAllSavedEntryDates();
+                return response.data;
+            }
+        } catch (error) {
+            ErrorNotification(error?.response?.data?.error || 'Failed to delete entry.');
+            throw error.response ? error : new Error("Something went wrong");
+        } finally {
+            setIsDeleting(false);
+        }
+    }
+
+
     const profileData = {
         name: user.name,
+        email: user.email,
         lastUpdated: user.updatedAt,
         dateOfBirth: user.dateOfBirth,
         gender: user.gender,
-        weight: user.weight,
+        weight: user.weight
     }
 
     return (
@@ -190,9 +225,18 @@ const Dashboard = () => {
                         profile={profileData} />
 
                     <SymptomTrendsChart
+                        selectedSymptom={selectedSymptom}
+                        setSelectedSymptom={setSelectedSymptom}
+                        selectedRange={selectedRange}
+                        setSelectedRange={setSelectedRange}
+                        reloadChart={reloadChart}
                     />
 
-                    <SymptomChangeFromBaselineChart/>
+                    <SymptomChangeFromBaselineChart
+                        selectedSymptom={selectedSymptom}
+                        setSelectedSymptom={setSelectedSymptom}
+                        reloadChart={reloadChart}
+                    />
                 </div>
 
                 {/* Right column */}
@@ -218,7 +262,9 @@ const Dashboard = () => {
                 symptoms={symptoms}
                 onSymptomChange={handleSymptomChange}
                 isSaving={isSaving}
+                isDeleting={isDeleting}
                 handleSaveEntry={handleSaveEntry}
+                handleDeleteEntry={handleDeleteEntry}
                 entryAlreadySaved={entryAlreadySaved}
             />
 

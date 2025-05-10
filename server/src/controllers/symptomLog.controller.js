@@ -1,5 +1,12 @@
-import { saveSymptomLogService, getSymptomLogByUserAndDate, getAllDatesWithEntriesForUserService } from "../services/symptomLog.service.js";
+import {
+    saveSymptomLogService,
+    getSymptomLogByUserAndDate,
+    getAllDatesWithEntriesForUserService,
+    deleteSymptomLogByUserAndDateService
+} from "../services/symptomLog.service.js";
 import { AppError, handleError } from "../utils/index.js";
+
+
 
 export const saveSymptomLog = async (req, res) => {
     try {
@@ -35,7 +42,7 @@ export const saveSymptomLog = async (req, res) => {
 
 
 export const fetchSymptomLogByDate = async (req, res) => {
-    
+
     const { userId, date } = req.query;
 
     try {
@@ -60,19 +67,53 @@ export const fetchSymptomLogByDate = async (req, res) => {
 
 
 export const getDatesWithEntries = async (req, res) => {
-  try {
-    const { userId } = req.query;
+    try {
+        const { userId } = req.query;
 
-    if (!userId) {
-      throw new AppError(400, "userId is required.");
+        if (!userId) {
+            throw new AppError(400, "userId is required.");
+        }
+
+        const dates = await getAllDatesWithEntriesForUserService(userId);
+
+        res.status(200).json({
+            datesWithEntries: dates,
+        });
+    } catch (error) {
+        handleError(res, error, error instanceof AppError ? error.statusCode : 500, "Failed to fetch dates.");
     }
+};
 
-    const dates = await getAllDatesWithEntriesForUserService(userId);
 
-    res.status(200).json({
-      datesWithEntries: dates,
-    });
-  } catch (error) {
-    handleError(res, error, error instanceof AppError ? error.statusCode : 500, "Failed to fetch dates.");
-  }
+
+export const deleteSymptomLogByDate = async (req, res) => {
+    const { userId, date } = req.query;
+
+    try {
+        if (!userId || !date) {
+            throw new AppError(400, "userId and date are required.");
+        }
+
+        const deleted = await deleteSymptomLogByUserAndDateService(userId, date);
+
+        if (!deleted) {
+            res
+                .status(404)
+                .json({
+                    message: "No symptom log found to delete."
+                });
+            return;
+        }
+
+        res.status(200).json({
+            message: "Symptom log deleted successfully.",
+        });
+    } catch (error) {
+        handleError(
+            res,
+            error,
+            error instanceof AppError ? error.statusCode : 500,
+            "Failed to delete symptom log."
+        );
+    }
 };

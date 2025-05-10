@@ -4,7 +4,7 @@ import { Info, RotateCcw } from "lucide-react"
  * Card component for individual symptom with slider
  * Displays symptom name, category, and severity slider
  */
-const SymptomCard = ({ symptom, onChange }) => {
+const SymptomCard = ({ symptom, onChange, entryAlreadySaved }) => {
   const { id, name, category, value, info } = symptom
 
   const handleReset = () => {
@@ -29,6 +29,7 @@ const SymptomCard = ({ symptom, onChange }) => {
         <div className="flex items-center gap-2">
           <span className="text-lg font-semibold">{value}</span>
           <button
+            disabled={entryAlreadySaved}
             onClick={handleReset}
             title="Reset"
             className="text-gray-400 hover:text-gray-600 transition"
@@ -40,6 +41,7 @@ const SymptomCard = ({ symptom, onChange }) => {
 
       <div className="mt-4">
         <input
+          disabled={entryAlreadySaved}
           type="range"
           min="0"
           max="10"

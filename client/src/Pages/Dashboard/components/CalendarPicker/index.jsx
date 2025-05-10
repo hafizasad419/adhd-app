@@ -34,8 +34,8 @@ const CalendarPicker = ({ selectedDate, onDateChange, entryDatesMap }) => {
   const monthEnd = endOfMonth(currentMonth)
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 }) // start Sunday
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 }) // end Saturday
-  // const daysInCalendar = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
-  const daysInCalendar = eachDayOfInterval({ start: monthStart, end: monthEnd })
+  const daysInCalendar = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
+  // const daysInCalendar = eachDayOfInterval({ start: monthStart, end: monthEnd })
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
@@ -72,7 +72,7 @@ const CalendarPicker = ({ selectedDate, onDateChange, entryDatesMap }) => {
           const dayClasses = [
             "p-2 rounded-md cursor-pointer text-center transition-all",
             isWithinRange ? "text-gray-900" : "text-gray-400",
-            isTodayDate ? "border border-blue-400" : "",
+            isTodayDate ? "border border-c-zinc" : "",
             isSelected ? "bg-c-zinc text-white" : "",
             isSavedEntry && !isSelected ? "bg-green-300 text-white" : "",
           ].join(" ");

@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    weight:{
+    weight: {
         type: Number,
         required: true
 

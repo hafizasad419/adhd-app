@@ -5,30 +5,47 @@ import {
 } from "recharts"
 import { useSelector } from "react-redux"
 import { fetchAllSavedEntryDates, fetchSymptomEntryForDate } from "../SymptomTrendsChart/api"
-import { format, parseISO } from "date-fns"
+import { format, parse, parseISO } from "date-fns"
+import { DATE_FORMAT_STRING } from "@src/constants"
 
-const SymptomChangeFromBaselineChart = () => {
+const SymptomChangeFromBaselineChart = ({
+  reloadChart,
+  selectedSymptom,
+  selectedRange }) => {
   const user = useSelector(state => state.user)
   const userId = user?._id
 
-  const [selectedSymptom, setSelectedSymptom] = useState("all")
   const [chartData, setChartData] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
+
+    const getCutoffForRange = (range) => {
+      const now = new Date();
+      switch (range) {
+        case "Week": return subDays(now, 7);
+        case "Month": return subMonths(now, 1);
+        case "3 Months": return subMonths(now, 3);
+        case "6 Months": return subMonths(now, 6);
+        case "Year": return subMonths(now, 12);
+        default: return null;
+      }
+    }
 
     const loadChartData = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         const datesMap = await fetchAllSavedEntryDates(userId)
-        let dates = Object.keys(datesMap).sort() // oldest to newest
+        let dates = Object.keys(datesMap).sort()
 
-        if (dates.length === 0) return
+        const cutoff = getCutoffForRange(selectedRange)
+        if (cutoff) {
+          dates = dates.filter(dateStr => parse(dateStr, DATE_FORMAT_STRING, new Date()) >= cutoff)
+        }
 
-        // Removed cutoff filtering – now uses all available dates
-        const allData = []
         let baseline = null
+        const allData = []
 
         for (const date of dates) {
           const res = await fetchSymptomEntryForDate(userId, date)
@@ -43,12 +60,11 @@ const SymptomChangeFromBaselineChart = () => {
           }
 
           if (baseline === null) baseline = score
-
           const change = baseline === 0 ? 0 : (score / baseline)
           const changePercent = baseline === 0 ? 0 : Math.round((change - 1) * 100)
 
           allData.push({
-            date: format(parseISO(date), "MMM dd yyyy"),
+            date: format(parse(date, "MM-dd-yyyy", new Date()), "MMM dd yyyy"),
             change,
             changePercent
           })
@@ -63,7 +79,8 @@ const SymptomChangeFromBaselineChart = () => {
     }
 
     loadChartData()
-  }, [selectedSymptom, userId])
+  }, [selectedSymptom, selectedRange, userId, reloadChart])
+
 
   const latestChange = chartData.length > 0 ? chartData[chartData.length - 1].changePercent : 0
   const changeColor = latestChange > 0 ? "text-red-600" : "text-green-600"
@@ -82,7 +99,10 @@ const SymptomChangeFromBaselineChart = () => {
               <XAxis
                 dataKey="date"
                 tickFormatter={d => d}
-                tick={{ fontSize: 12 }}
+                tick={{
+                  fontSize: 10,
+                  fill: '#364153'
+                }}
               />
               <YAxis
                 domain={['auto', 'auto']}

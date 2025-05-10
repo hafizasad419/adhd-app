@@ -7,6 +7,9 @@ function ReadOnlyProfileInfo({ profile }) {
                 label_text="Name"
                 text={profile.name} />
             <ReadOnlyInput
+                label_text="Email"
+                text={profile.email} />
+            <ReadOnlyInput
                 label_text="Date of Birth"
                 text={profile.dateOfBirth} />
             <ReadOnlyInput

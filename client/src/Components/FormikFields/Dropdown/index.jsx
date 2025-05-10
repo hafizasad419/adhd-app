@@ -37,7 +37,7 @@ const Dropdown = ({
 
 
     return (
-        <div className="mb-4 relative w-full">
+        <div className="mb-4 relative w-full ">
             {label_text && (
                 <label htmlFor={field} className="block mb-1 text-sm font-medium text-gray-700">
                     {label_text}
@@ -56,7 +56,7 @@ const Dropdown = ({
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(!isOpen)}
-                                className={`w-full flex justify-between items-center bg-white rounded-md px-4 py-3 text-gray-700 shadow-sm transition-all
+                                className={`w-full flex justify-between items-center bg-white rounded-md px-4 py-2 text-gray-700 shadow-sm transition-all
                   outline-none border-2 
                   ${error ? "border-red-400" : "border-gray-200"} 
                   ${success ? "border-green-400" : ""}
@@ -87,7 +87,7 @@ const Dropdown = ({
                             )}
 
                             {error && <p className="error-message">{meta.error}</p>}
-                            {success && <p className="success-message">Looks good!</p>}
+                            {/* {success && <p className="success-message">Looks good!</p>} */}
                         </>
                     );
                 }}

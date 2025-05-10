@@ -1,7 +1,6 @@
 import { SymptomLog } from "../models/symptomLog.model.js";
 import { AppError } from "../utils/index.js";
-import mongoose from "mongoose";
-import { DATE_FORMAT_REGEX } from "../constants.js"
+import { DATE_FORMAT_REGEX, DATE_FORMAT_STRING } from "../constants.js"
 
 export const saveSymptomLogService = async (userId, date, scores) => {
   try {
@@ -11,7 +10,7 @@ export const saveSymptomLogService = async (userId, date, scores) => {
 
 
     if (!DATE_FORMAT_REGEX.test(date)) {
-      throw new AppError(400, "Date must be in YYYY-MM-DD format.");
+      throw new AppError(400, `Date must be in ${DATE_FORMAT_STRING} format.`);
     }
 
     const update = { scores };
@@ -22,7 +21,7 @@ export const saveSymptomLogService = async (userId, date, scores) => {
     };
 
     const symptomLog = await SymptomLog.findOneAndUpdate(
-      { user: userId, date},
+      { user: userId, date },
       update,
       options
     );
@@ -38,8 +37,8 @@ export const saveSymptomLogService = async (userId, date, scores) => {
 export const getSymptomLogByUserAndDate = async (userId, date) => {
 
   if (!DATE_FORMAT_REGEX.test(date)) {
-      throw new AppError(400, "Date must be in YYYY-MM-DD format.");
-    }
+    throw new AppError(400, `Date must be in ${DATE_FORMAT_STRING} format.`);
+  }
 
 
   const log = await SymptomLog.findOne({
@@ -61,15 +60,34 @@ export const getAllDatesWithEntriesForUserService = async (userId) => {
   try {
     // Step 1: Get all symptom logs for the user
     const logs = await SymptomLog.find({ user: userId }).select("date -_id");
-    
-    const dates = logs.map(log => log.date.split("T")[0]); 
+
+    const dates = logs.map(log => log.date.split("T")[0]);
     const uniqueDates = [...new Set(dates)];
     uniqueDates.sort((a, b) => new Date(b) - new Date(a));
-  
+
     return uniqueDates;
 
   } catch (error) {
     throw new AppError(500, "Failed to fetch dates with entries.");
+  }
+};
+
+
+export const deleteSymptomLogByUserAndDateService = async (userId, date) => {
+  try {
+    if (!DATE_FORMAT_REGEX.test(date)) {
+      throw new AppError(400, `Date must be in ${DATE_FORMAT_STRING} format.`);
+    }
+
+    const result = await SymptomLog.findOneAndDelete({
+      user: userId,
+      date,
+    });
+
+    return result; // will be null if not found
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(500, error?.message || "Failed to delete symptom log.");
   }
 };
 

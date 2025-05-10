@@ -49,7 +49,7 @@ const Login = () => {
             if (error.response && error.response.data && error.response.data.error) {
                 ErrorNotification(error.response.data.error);
             } else {
-                ErrorNotification("Invalid Email or Password. Please try again.");
+                ErrorNotification("An unexpected error occured while logging in");
             }
         } finally {
             setSubmitting(false);

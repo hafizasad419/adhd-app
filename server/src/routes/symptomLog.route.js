@@ -1,11 +1,21 @@
 import { Router } from "express";
-import { fetchSymptomLogByDate, getDatesWithEntries, saveSymptomLog } from "../controllers/symptomLog.controller.js";
+import {
+    deleteSymptomLogByDate,
+    fetchSymptomLogByDate,
+    getDatesWithEntries,
+    saveSymptomLog
+}
+    from "../controllers/symptomLog.controller.js";
 
 const symptomLogRouter = Router();
 
 // POST /api/v1/symptom-logs
 symptomLogRouter
-    .post("/", saveSymptomLog);
+.post("/", saveSymptomLog);
+
+// DELETE /api/v1/symptom-logs
+symptomLogRouter
+    .delete("/", deleteSymptomLogByDate);
 
 
 symptomLogRouter

@@ -5,7 +5,7 @@ import { ErrorNotification } from "@src/utils"
 /**
  * Fetch symptoms for a specific date
  * @param {String} userId - ID of the user
- * @param {String} date - Date string in YYYY-MM-DD format
+ * @param {String} date - Date string in MM-yyyy-dd format
  * @returns {Object} - { symptoms: [...], entryAlreadySaved: boolean }
  */
 export const fetchSymptomEntryForDate = async (userId, date) => {

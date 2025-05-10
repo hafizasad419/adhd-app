@@ -43,18 +43,19 @@ export const formatDateOfBirthInput = (value) => {
   // Remove non-digit characters
   const digitsOnly = value.replace(/\D/g, '');
 
-  // Format as YYYY-MM-DD
-  const year = digitsOnly.slice(0, 4);
-  const month = digitsOnly.slice(4, 6);
-  const day = digitsOnly.slice(6, 8);
+  // Extract MM-DD-YYYY
+  const month = digitsOnly.slice(0, 2);
+  const day = digitsOnly.slice(2, 4);
+  const year = digitsOnly.slice(4, 8);
 
-  let formatted = year;
-  if (month) formatted += `-${month}`;
+  let formatted = '';
+  if (month) formatted += month;
   if (day) formatted += `-${day}`;
-
+  if (year) formatted += `-${year}`;
 
   return formatted;
 };
+
 
 
 export const formatSymptomScoresPayload = (symptoms) => {
@@ -131,6 +132,7 @@ export const removeToken = (role) => {
 };
 
 
+
 /**
  * Format a date as a readable string
  * @param {Date} date - The date to format
@@ -141,11 +143,11 @@ export const formatDate = (date) => {
 }
 
 
-export const formatDateToYMD = (date = new Date()) => {
-  const year = date.getFullYear();
+export const formatDateToMDY = (date = new Date()) => {
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  const year = date.getFullYear();
+  return `${month}-${day}-${year}`;
 };
 
 
@@ -190,58 +192,6 @@ export const buildSymptomTrendData = async (selectedSymptomId, fetchAllSavedEntr
   return result;
 };
 
-
-
-
-// generates mock data
-// export const generateTrendData = (days = 7) => {
-//   const data = []
-//   const today = new Date()
-
-//   for (let i = days; i >= 0; i--) {
-//     const date = new Date()
-//     date.setDate(today.getDate() - i)
-
-//     // Generate a score that trends upward slightly
-//     const baseScore = 70
-//     const randomVariation = Math.floor(Math.random() * 10) - 5
-//     const trendIncrease = (days - i) * 2
-//     const score = Math.min(100, Math.max(0, baseScore + randomVariation + trendIncrease))
-
-//     data.push({
-//       date: date.toISOString(),
-//       score,
-//     })
-//   }
-
-//   return data
-// }
-
-/**
- * Generate mock baseline change data
- */
-// export const generateBaselineChangeData = (days = 7) => {
-//   const data = []
-//   const today = new Date()
-//   const baselineValue = 0
-
-//   for (let i = days; i >= 0; i--) {
-//     const date = new Date()
-//     date.setDate(today.getDate() - i)
-
-//     // Generate a change that increases over time
-//     const change = (days - i) * 0.3
-//     const changePercent = Math.round(change * 100) / 10
-
-//     data.push({
-//       date: date.toISOString(),
-//       change,
-//       changePercent,
-//     })
-//   }
-
-//   return data
-// }
 
 /**
  * Calculate total symptom score from individual ratings

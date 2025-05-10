@@ -8,7 +8,6 @@ const ReusableHeader = ({
     showIcons = false,
     onLogout,
     isLoggingOut,
-    onSettingsHandler
 }) => {
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -38,11 +37,6 @@ const ReusableHeader = ({
                         <div
                             className='flex flex-col md:flex-row space-x-8 px-12'
                         >
-                            <span>
-                                <Settings
-                                onClick={onSettingsHandler}
-                                className="cursor-pointer text-c-zinc w-6 h-6" />
-                            </span>
                             <span>
 
                                 {
@@ -99,13 +93,6 @@ const ReusableHeader = ({
                     ))}
                     {showIcons && (
                         <div className="flex flex-col space-y-4 w-full">
-                            <button
-                            onClick={onSettingsHandler}
-                            className="btn btn-primary w-full flex items-center justify-center">
-                                <Settings className="w-5 h-5 mr-2" />
-                                Settings
-                            </button>
-
                             <button
                                 className="btn btn-outline w-full flex items-center justify-center"
                                 onClick={onLogout}

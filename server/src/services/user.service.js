@@ -28,7 +28,7 @@ export const getUserProfileService = async (userId) => {
 // Allow updating specific fields only
 export const updateUserProfileService = async (userId, updates) => {
   try {
-    const allowedFields = ["name", "dateOfBirth", "weight"];
+    const allowedFields = ["name", "dateOfBirth", "weight", "gender", "email"];
     const updateData = {};
 
     for (const key of allowedFields) {

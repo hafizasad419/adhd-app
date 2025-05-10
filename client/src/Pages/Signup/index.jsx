@@ -1,13 +1,14 @@
 import { Formik, Form, Field } from 'formik';
+import { parse, isValid, format } from 'date-fns';
 import * as yup from 'yup';
 import TextField from '@src/Components/FormikFields/TextField';
 import Dropdown from '@src/Components/FormikFields/Dropdown';
 import { BiLoaderAlt } from 'react-icons/bi';
 import { userSignup } from './api';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { GENDERS } from '@src/constants';
+import { DATE_FORMAT_STRING, GENDERS, WEIGHT_UNIT } from '@src/constants';
 import { formatDateOfBirthInput } from '@src/utils';
-import {  DATE_FORMAT_REGEX } from '@src/constants';
+import { DATE_FORMAT_REGEX } from '@src/constants';
 import { Brain } from 'lucide-react';
 
 
@@ -19,24 +20,24 @@ const Signup = () => {
         name: yup.string().min(3, "Come on don't be shy").required('Required'),
         dateOfBirth: yup
             .string()
-            .max(10)
-            .matches(DATE_FORMAT_REGEX, 'Invalid date format. Please use YYYY-MM-DD').test('is-valid-date', 'Invalid date', (value) => {
+            .required("Required")
+            .matches(DATE_FORMAT_REGEX, "Invalid date format. Please use MM-DD-YYYY")
+            .test("is-valid-date", "Invalid date", (value) => {
                 if (!value) return false;
-                const date = new Date(value);
-                const isValid =
-                    date instanceof Date &&
-                    !isNaN(date.getTime()) &&
-                    value === date.toISOString().slice(0, 10); // Strict match
-                return isValid;
+                const parsedDate = parse(value, DATE_FORMAT_STRING, new Date());
+                // Check parsed date is valid and exact match to input
+                return (
+                    isValid(parsedDate) &&
+                    format(parsedDate, DATE_FORMAT_STRING) === value
+                );
             })
-            .test('age-limit', 'Must be between 1900 and today', (value) => {
+            .test("age-limit", "Date must be between 1900 and today", (value) => {
                 if (!value) return false;
-                const date = new Date(value);
+                const date = parse(value, DATE_FORMAT_STRING, new Date());
                 const year = date.getFullYear();
                 const today = new Date();
                 return year >= 1900 && date <= today;
-            }).required('Required'),
-
+            }),
         gender: yup.
             string().
             oneOf(GENDERS, 'Invalid gender')
@@ -68,7 +69,7 @@ const Signup = () => {
         email: '',
         password: '',
         gender: '',
-        dateOfBirth: '', // This will be a string in YYYY-MM-DD format
+        dateOfBirth: '', // This will be a string in MM-dd-yyyy format
         weight: '',
         confirmPassword: '',
 
@@ -78,7 +79,7 @@ const Signup = () => {
         const { dateOfBirth, ...rest } = values;
         const payload = {
             ...rest,
-            dateOfBirth: dateOfBirth || '', // Send date as string in YYYY-MM-DD format
+            dateOfBirth: dateOfBirth || '', // Send date as string in MM-dd-yyyy format
             role: 'user',
         };
 
@@ -118,8 +119,8 @@ const Signup = () => {
 
                                 <TextField
                                     field="dateOfBirth"
-                                    label_text="Date of Birth (YYYY-MM-DD)"
-                                    placeholder="YYYY-MM-DD"
+                                    label_text={`Date of Birth (${DATE_FORMAT_STRING})`}
+                                    placeholder={DATE_FORMAT_STRING}
                                     maxLength={10}
                                     onChange={(e) => {
                                         const formatted = formatDateOfBirthInput(e.target.value);
@@ -127,7 +128,6 @@ const Signup = () => {
                                         return formatted; // This is crucial
                                     }}
                                 />
-
 
                                 <Dropdown
                                     field="gender"
@@ -137,7 +137,8 @@ const Signup = () => {
                                 />
                                 <TextField
                                     field="weight"
-                                    label_text="Weight (in Kg)" placeholder="e.g, 58" />
+                                    label_text={`Weight in ${WEIGHT_UNIT}`}
+                                    placeholder="e.g, 45" />
 
                                 <TextField field="email" label_text="Email" placeholder="Enter your email" />
                                 <TextField
