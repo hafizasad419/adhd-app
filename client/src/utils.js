@@ -1,12 +1,13 @@
 import { toast } from 'react-hot-toast';
 import { format } from "date-fns"
-import { USER_STORAGE_KEYS, ACTIVE_USER_ROLE_KEY } from "@src/constants";
+import Papa from "papaparse";
+import { USER_STORAGE_KEYS, ACTIVE_USER_ROLE_KEY, DATE_FORMAT_OPTIONS } from "@src/constants";
 
 
 export const SuccessNotification = (message = 'Success!') => {
   toast.success(message, {
     duration: 3000,
-    position: 'center-bottom',
+    position: 'center-top',
     style: {
       background: '#10b981', // Tailwind green-500
       color: '#fff',
@@ -24,7 +25,7 @@ export const SuccessNotification = (message = 'Success!') => {
 export const ErrorNotification = (message = 'Something went wrong') => {
   toast.error(message, {
     duration: 4000,
-    position: 'center-bottom',
+    position: 'center-top',
     style: {
       background: '#ef4444', // Tailwind red-500
       color: '#fff',
@@ -217,6 +218,47 @@ export const popupAnimation = {
   },
 };
 
+
+// Export User Data to CSV (For Admin)
+export const exportToCSV = (users) => {
+  if (!users || users.length === 0) return;
+
+  // Format `createdAt` and `updatedAt`, everything else passed as-is
+  const formattedUsers = users.map(user => ({
+    ...user,
+    createdAt: new Date(user.createdAt).toLocaleDateString("en-GB", DATE_FORMAT_OPTIONS),
+    updatedAt: new Date(user.updatedAt).toLocaleDateString("en-GB", DATE_FORMAT_OPTIONS),
+  }));
+
+  const csv = Papa.unparse(formattedUsers);
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+
+  link.setAttribute("href", url);
+  link.setAttribute("download", "users.csv");
+  link.style.visibility = "hidden";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link)
+}
+
+
+export const generateSymptomIdFromName = (name) => {
+        const words = name.trim().split(" ");
+        if (words.length === 0) return null;
+
+        const first = words[0];
+        if (first.length >= 4) {
+            return first.toLowerCase();
+        }
+
+        const second = words[1] || "";
+        const combined = `${first}${second}`.toLowerCase();
+        return combined;
+    };
 
 
 

@@ -91,3 +91,23 @@ export const deleteSymptomLogByUserAndDateService = async (userId, date) => {
   }
 };
 
+
+
+export const getAllSymptomLogsService = async () => {
+  try {
+    const logs = await SymptomLog.find({})
+      .populate({
+        path: "user",
+        select: "name _id"
+      })
+      .select("user date scores -_id") // exclude _id if not needed
+
+    return logs.map(log => ({
+      name: log.user?.name || "Unknown",
+      date: log.date,
+      scores: log.scores
+    }));
+  } catch (error) {
+    throw new AppError(500, error?.message || "Failed to fetch all symptom logs.");
+  }
+};

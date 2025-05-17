@@ -3,13 +3,16 @@ import {
     signupAdminService,
     loginAdminService,
     loginUserService,
-    signupUserService
+    signupUserService,
+    verifyEmailService
 } from "../services/auth.service.js";
+import { AdminSettings } from "../models/adminSettings.model.js";
 import { Admin } from "../models/admin.model.js";
 import { User } from "../models/user.model.js";
 import { COOKIE_OPTIONS, ROLES } from "../constants.js";
 import { AppError, handleError } from "../utils/index.js";
-import { SECRET_KEY } from "../config/index.js";
+import { resendEmailVerificationService } from "../services/auth.service.js";
+// import { SECRET_KEY } from "../config/index.js";
 
 
 
@@ -24,11 +27,23 @@ export const signupUser = async (req, res) => {
             role,
             gender,
             dateOfBirth,
-            weight
+            weight,
+            type
         } = req.body;
-        console.log (name, email,password,role,gender,dateOfBirth,weight)
 
-        if (!name || !email || !password || !role || !gender || !dateOfBirth || !weight) {
+        // console.log (name, email,password,role,gender,dateOfBirth,weight,type)
+
+
+        const adminSettings = await AdminSettings
+            .findOne()
+            .sort({ createdAt: -1 })
+            .lean();
+
+        if (!adminSettings?.allowUserRegistration) {
+            throw new AppError(403, "User registration is currently disabled by the admin.");
+        }
+
+        if (!name || !email || !password || !role || !gender || !dateOfBirth || !weight || !type) {
             throw new AppError(400, "All fields are required.")
         }
 
@@ -40,14 +55,16 @@ export const signupUser = async (req, res) => {
             role,
             gender,
             dateOfBirth,
-            weight
+            weight,
+            type
         )
 
         // console.log("Signed Up User", user)
 
         res.status(201).json({
+            success: true,
             message: "User Created Successfully",
-            id: user._id.toString()
+            user
         });
 
     } catch (error) {
@@ -70,6 +87,8 @@ export const loginUser = async (req, res) => {
         }
 
         const user = await loginUserService(email, password);
+
+
         const { accessToken } = await generateAccessToken(user._id, User, "User");
 
 
@@ -96,17 +115,17 @@ export const loginUser = async (req, res) => {
 // Signup Admin
 export const signupAdmin = async (req, res) => {
     try {
-        const { name, email, password, secretKey } = req.body;
+        const { name, email, password } = req.body;
 
-        if (!name || !email || !password || !secretKey) {
+        if (!name || !email || !password) {
             throw new AppError(400, "All fields are required.")
         }
 
         // console.log("Received Secret Key:", secretKey);
         // console.log("Loaded Secret Key:", SECRET_KEY);
-        if (secretKey !== SECRET_KEY) {
-            throw new AppError(401, "Invalid Secret Key");
-        }
+        // if (secretKey !== SECRET_KEY) {
+        //     throw new AppError(401, "Invalid Secret Key");
+        // }
 
         const admin = await signupAdminService(name, email, password)
 
@@ -197,6 +216,49 @@ export const signup = async (req, res) => {
         handleError(res, error, 500, "Error While Signing Up");
     }
 };
+
+
+
+
+export const resendEmailVerification = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const result = await resendEmailVerificationService(email);
+
+        res
+            .status(200)
+            .json(result);
+
+    } catch (error) {
+        handleError(res, error, error instanceof AppError ? error.statusCode : 401, "Unexpected errorwhile resending email verification link.");
+    }
+};
+
+
+
+
+export const verifyEmail = async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        if (!token) {
+            throw new AppError(400, "Verification token is required.");
+        }
+
+        const result = await verifyEmailService(token);
+
+        res.status(200).json(result);
+    } catch (error) {
+        if (error instanceof AppError) {
+            handleError(res, error, error.statusCode, error.message);
+        } else {
+            handleError(res, error, 500, "Error While Verifying Email");
+        }
+    }
+};
+
+
 
 
 // Logout Admin

@@ -2,8 +2,8 @@
 
 
 @theme {
-    --color-c-zinc: #00897b;
-  }
+  --color-c-zinc: #00897b;
+}
 
 
 * {
@@ -21,20 +21,62 @@
 }
 
 .btn-outline {
-  @apply shadow-xl p-4 text-c-zinc bg-transparent border border-c-zinc  font-bold rounded-lg transition duration-300 ease-in-out select-none focus:outline-none disabled:bg-c-zinc/15 disabled:text-white disabled:cursor-not-allowed capitalize active:shadow-md active:scale-90 cursor-pointer;
+  @apply shadow-xl p-4 text-c-zinc bg-transparent border border-c-zinc font-bold rounded-lg transition duration-300 ease-in-out select-none focus:outline-none disabled:bg-c-zinc/15 disabled:text-white disabled:cursor-not-allowed capitalize active:shadow-md active:scale-90 cursor-pointer;
 }
 
 .btn-primary {
   @apply shadow-xl p-4 text-[#ffffff] bg-c-zinc font-bold rounded-lg transition duration-300 ease-in-out select-none focus:outline-none disabled:bg-c-zinc/50 disabled:text-white disabled:cursor-not-allowed capitalize active:shadow-md active:scale-90 cursor-pointer;
 }
 
+.btn-container {
+  @apply flex justify-center 
+}
+
+/* styles/input.css */
+.input-field {
+  @apply w-full px-3 py-2 rounded-md bg-white text-gray-800 placeholder-gray-400 outline-none border-2 focus:border-gray-300 transition-all border-gray-200;
+}
+
+.input-field.has-icon {
+  @apply pl-10;
+}
+
+.input-field.disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+.input-field.error {
+  @apply border-red-400;
+}
+
+.input-field.success {
+  @apply border-green-400;
+}
+
+.select-field {
+  @apply w-full px-3 py-2 rounded-md bg-white text-gray-800 outline-none border-2 focus:border-gray-300 transition-all border-gray-200 appearance-none;
+}
+
+.select-field.disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+.select-field.error {
+  @apply border-red-400;
+}
+
+.select-field.success {
+  @apply border-green-400;
+}
+
 
 /* Error and Success Messages */
-.error-message{
-  @apply bg-red-100 text-red-500 p-4 rounded-xl my-4 text-sm 
+.error-message {
+  @apply bg-red-100 text-red-500 p-4 rounded-xl my-4 text-sm
 }
-.success-message{
-  @apply bg-green-100 text-green-600 p-4 rounded-xl my-4 text-sm 
+
+.success-message {
+  @apply bg-green-100 text-green-600 p-4 rounded-xl my-4 text-sm
 }
 
 
@@ -94,6 +136,10 @@ body::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
+/* .custom-slider-thumb::-webkit-slider-thumb {
+  background-color: #00897b;
+} */
+
 .custom-slider-thumb::-moz-range-thumb {
   height: 16px;
   width: 16px;
@@ -108,9 +154,28 @@ body::-webkit-scrollbar-thumb:hover {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background-color: #00897b;
   border: none;
   cursor: pointer;
+}
+
+
+/* Assuming you're using Tailwind + custom styles */
+.thumb-gray::-webkit-slider-thumb {
+  background-color: #6b7280;
+  /* Tailwind gray-500 */
+}
+
+.thumb-green::-webkit-slider-thumb {
+  background-color: #00897b;
+  /* Custom green */
+}
+
+.thumb-gray::-moz-range-thumb {
+  background-color: #6b7280;
+}
+
+input[type='range'].thumb-green::-moz-range-thumb {
+  background-color: #00897b;
 }
 
 

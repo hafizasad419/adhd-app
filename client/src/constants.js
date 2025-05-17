@@ -27,7 +27,7 @@ export const IS_PRODUCTION =
 
 export const BASE_URL = IS_PRODUCTION ?
   "https://adhd-app-backend.vercel.app/api/v1" :
-  "http://192.168.1.105:5000/api/v1"
+  "http://192.168.1.107:5000/api/v1"
 
 
 export const ADHD_APP_ACCESS = "adhd-app-access"
@@ -38,6 +38,14 @@ export const GENDERS = [
   "Male",
   "Female",
   "Other"
+]
+
+export const ROLES = ["user", "admin"];
+
+
+export const USER_TYPES = [
+  "client",
+  "non-client"
 ]
 
 
@@ -51,7 +59,18 @@ export const ACTIVE_USER_ROLE_KEY = "ACTIVE_USER_ROLE";
 
 export const DATE_FORMAT_REGEX = /^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$/;
 export const DATE_FORMAT_STRING = "MM-dd-yyyy";
+export const DATE_FORMAT_OPTIONS = {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+};
 export const WEIGHT_UNIT = "pounds"
+
+export const SYMPTOM_CATEGORIES = [
+    { label: "Physical", value: "physical" },
+    { label: "Behavioral", value: "behavioral" },
+    { label: "Other", value: "other" },
+];
 
 
 

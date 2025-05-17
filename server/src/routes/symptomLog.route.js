@@ -3,7 +3,8 @@ import {
     deleteSymptomLogByDate,
     fetchSymptomLogByDate,
     getDatesWithEntries,
-    saveSymptomLog
+    saveSymptomLog,
+    getAllSymptomLogs
 }
     from "../controllers/symptomLog.controller.js";
 
@@ -11,7 +12,10 @@ const symptomLogRouter = Router();
 
 // POST /api/v1/symptom-logs
 symptomLogRouter
-.post("/", saveSymptomLog);
+    .post("/", saveSymptomLog);
+
+symptomLogRouter
+    .get("/", getAllSymptomLogs);
 
 // DELETE /api/v1/symptom-logs
 symptomLogRouter

@@ -2,7 +2,8 @@ import {
     saveSymptomLogService,
     getSymptomLogByUserAndDate,
     getAllDatesWithEntriesForUserService,
-    deleteSymptomLogByUserAndDateService
+    deleteSymptomLogByUserAndDateService,
+    getAllSymptomLogsService
 } from "../services/symptomLog.service.js";
 import { AppError, handleError } from "../utils/index.js";
 
@@ -114,6 +115,25 @@ export const deleteSymptomLogByDate = async (req, res) => {
             error,
             error instanceof AppError ? error.statusCode : 500,
             "Failed to delete symptom log."
+        );
+    }
+};
+
+
+export const getAllSymptomLogs = async (req, res) => {
+    try {
+        const logs = await getAllSymptomLogsService();
+
+        res.status(200).json({
+            message: "Fetched all symptom logs successfully.",
+            symptomLogs: logs
+        });
+    } catch (error) {
+        handleError(
+            res,
+            error,
+            error instanceof AppError ? error.statusCode : 500,
+            "Failed to fetch all symptom logs."
         );
     }
 };

@@ -2,6 +2,7 @@ import bcrypt, { compare } from "bcryptjs";
 import mongoose from "mongoose"
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../config/index.js";
+import { USER_TYPES } from "../constants.js";
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -40,7 +41,18 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user',
         required: true
-    }
+    },
+    type: {
+        type: String,
+        enum: USER_TYPES,
+        default: 'non-client',
+        required: true
+    },
+    emailVerificationToken: String,
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {
