@@ -19,7 +19,7 @@ function Symptoms() {
   const fetchSymptoms = async () => {
     try {
       const res = await Axios.get("/symptoms");
-      // console.log(res.data.symptoms)
+      console.log(res.data.symptoms)
       setSymptoms(res.data.symptoms);
     } catch (error) {
       ErrorNotification(error?.response?.data?.error || 'Failed to fetch symptoms.');

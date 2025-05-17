@@ -9,9 +9,10 @@ import SymptomList from "./components/SymptomList"
 import { format } from "date-fns";
 
 // Utils and data
-import { DATE_FORMAT_STRING, SYMPTOMS } from "@src/constants.js"
+import { DATE_FORMAT_STRING } from "@src/constants.js"
 import { formatDate, calculateTotalScore, ErrorNotification, SuccessNotification } from "@src/utils.js"
 import { Axios } from "@src/api"
+import { fetchSymptoms } from "./api"
 
 
 /**
@@ -23,6 +24,7 @@ const Dashboard = () => {
     const getLocalDateString = (date = new Date()) => format(date, DATE_FORMAT_STRING);
 
     const [selectedDate, setSelectedDate] = useState(getLocalDateString());
+    const [SYMPTOMS, SET_SYMPTOMS] = useState([])
     const [symptoms, setSymptoms] = useState([])
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -32,6 +34,17 @@ const Dashboard = () => {
     const [reloadChart, setReloadChart] = useState(false);
     const [selectedSymptom, setSelectedSymptom] = useState("all")
     const [selectedRange, setSelectedRange] = useState("Month")
+
+
+
+    useEffect(() => {
+        const loadSymptoms = async () => {
+            const data = await fetchSymptoms();
+            SET_SYMPTOMS(data);
+        };
+
+        loadSymptoms();
+    }, []);
 
 
 
@@ -55,7 +68,7 @@ const Dashboard = () => {
                     const matchingScore = savedScores.find(s => s.symptomId === symptom.id);
                     return {
                         ...symptom,
-                        value: matchingScore?.score || symptom.defaultValue,
+                        value: matchingScore?.score || symptom.value,
                     }
                 });
 
@@ -67,7 +80,7 @@ const Dashboard = () => {
                 // No entry found
                 const initialSymptoms = SYMPTOMS.map((symptom) => ({
                     ...symptom,
-                    value: symptom.defaultValue,
+                    value: symptom.value,
                 }));
                 setSymptoms(initialSymptoms);
                 setEntryAlreadySaved(false);
@@ -104,7 +117,7 @@ const Dashboard = () => {
     useEffect(() => {
         const initialSymptoms = SYMPTOMS?.map((symptom) => ({
             ...symptom,
-            value: symptom.defaultValue,
+            value: symptom.value,
         }))
 
         setSymptoms(initialSymptoms)
@@ -118,10 +131,10 @@ const Dashboard = () => {
 
     // Fetch Symptom Entry For Selected Date
     useEffect(() => {
-        if (user?._id) {
+        if (user?._id && SYMPTOMS.length > 0) {
             fetchSymptomEntryForDate(selectedDate);
         }
-    }, [selectedDate, user?._id]);
+    }, [selectedDate, user?._id, SYMPTOMS]);
 
 
     useEffect(() => {

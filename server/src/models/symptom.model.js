@@ -18,6 +18,10 @@ const symptomSchema = new mongoose.Schema(
             required: true,
             enum: ["behavioral", "physical"],
         },
+        value: {
+            type: Number,
+            default: 0
+        }
     },
     { timestamps: true }
 );
